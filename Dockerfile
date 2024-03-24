@@ -17,9 +17,10 @@ RUN poetry config virtualenvs.create false \
 # Set Flask run configuration
 ENV FLASK_RUN_HOST=0.0.0.0
 ENV FLASK_RUN_PORT=8080
+ENV FLASK_ENV=development
 
 # Make port 5001 available to the world outside this container
 EXPOSE 8080
 
-# Run app.py when the container launches
-CMD ["flask", "run"]
+# Run wsgi.py when the container launches
+CMD ["python", "wsgi.py"]
