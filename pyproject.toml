@@ -11,6 +11,9 @@ flask = "^3.0.2"
 sqlalchemy = "^2.0.28"
 flask-sqlalchemy = "^3.1.1"
 pymysql = "^1.1.0"
+flask-login = "^0.6.3"
+pyjwt = "^2.8.0"
+flask-cors = "^4.0.0"
 
 
 [build-system]
