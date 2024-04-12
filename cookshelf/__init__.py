@@ -21,8 +21,10 @@ def init_app(config_object='config.Config'):
     with app.app_context():
         # Include our Routes
         from .ingredients.routes import ingredients
+        from .users.routes import users
 
         # Register Blueprints
         app.register_blueprint(ingredients, url_prefix='/ingredients')
+        app.register_blueprint(users, url_prefix='/users')
 
         return app
