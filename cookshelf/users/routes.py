@@ -30,7 +30,7 @@ def create_user():
 
     sql = text(f"""
                 INSERT INTO Users (email, first_name, last_name, user_name)
-                VALUES (:email, :fist_name, :last_name, :user_name)
+                VALUES (:email, :first_name, :last_name, :user_name)
             """)
     try:
         db.session.execute(sql, {
