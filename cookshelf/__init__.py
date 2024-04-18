@@ -2,7 +2,6 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 
-
 # Globally accessible libraries
 db = SQLAlchemy()
 
@@ -22,9 +21,11 @@ def init_app(config_object='config.Config'):
         # Include our Routes
         from .ingredients.routes import ingredients
         from .users.routes import users
+        from cookshelf.recipes.routes import recipes
 
         # Register Blueprints
         app.register_blueprint(ingredients, url_prefix='/ingredients')
         app.register_blueprint(users, url_prefix='/users')
+        app.register_blueprint(recipes, url_prefix='/recipes')
 
         return app
