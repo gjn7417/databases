@@ -1,8 +1,8 @@
-from flask import Blueprint, jsonify, request
-from sqlalchemy import text
+from flask import Blueprint, request
 
 from cookshelf import db
-from cookshelf.recipes.recipe import Recipe
+from cookshelf.recipes.data_models.recipe import Recipe
+from cookshelf.recipes.recipe_dao import RecipeDAO
 
 recipes = Blueprint('recipes', __name__)
 
@@ -11,16 +11,26 @@ recipes = Blueprint('recipes', __name__)
 def create_recipe():
     data = request.get_json()
     recipe = Recipe(**data)
+    recipe_dao = RecipeDAO(db)
+    return recipe_dao.create_recipe(recipe=recipe)
 
-    sql = text(f"""
-            INSERT INTO Recipes (recipe_name, user_email, difficulty, time_in_min, instructions)
-            VALUES (:recipe_name, :user_email, :difficulty, :time_in_min, :instructions)
-        """)
-    try:
-        db.session.execute(sql, {'recipe_name': recipe.recipe_name, 'user_email': recipe.user_email,
-                                 'difficulty': recipe.difficulty, 'time_in_min': recipe.time_in_min,
-                                 'instructions': recipe.instructions})
-        db.session.commit()
-        return jsonify({"success": True}), 201
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 400
+
+@recipes.route('/update-recipe', methods=['POST'])
+def update_recipe():
+    data = request.get_json()
+    recipe = Recipe(**data)
+    recipe_dao = RecipeDAO(db)
+    return recipe_dao.update_recipe(recipe=recipe)
+
+
+@recipes.route('/get-recipe-reviews', methods=['GET'])
+def get_recipe_reviews():
+    recipe_id = int(request.args.get('id'))
+    recipe_dao = RecipeDAO(db)
+    return recipe_dao.get_recipe_reviews(recipe_id=recipe_id)
+
+
+@recipes.route('/get-all-recipes', methods=['GET'])
+def get_all_recipes():
+    recipe_dao = RecipeDAO(db)
+    return recipe_dao.get_all_recipes()
