@@ -1,9 +1,8 @@
-import logging
-
 from flask import jsonify
 from sqlalchemy import text
 
 from cookshelf.ingredients.data_models.ingredient import Ingredient
+
 
 class IngredientDAO:
     def __init__(self, db):
@@ -51,12 +50,12 @@ class IngredientDAO:
                 WHERE id = :id
             """)
         try:
-            self.db.session.execute(sql, {'id': ingredient.id, 'name': ingredient.name, 'food_category': ingredient.food_category})
+            self.db.session.execute(sql, {'id': ingredient.id, 'name': ingredient.name,
+                                          'food_category': ingredient.food_category})
             self.db.session.commit()
             return jsonify({"success": True}), 200
         except Exception as e:
             return jsonify({"success": False, "error": str(e)}), 400
-
 
     def add_ingredients_to_recipe(self, recipe_id: int, ingredients: list[Ingredient]):
         print(f"Adding ingredients to recipe {recipe_id}, ingredients: {ingredients}")
@@ -85,7 +84,6 @@ class IngredientDAO:
         except Exception as e:
             return jsonify({"success": False, "error": str(e)}), 400
 
-
     def delete_recipe_ingredient_mapping(self, recipe_id: int, ingredient_id: int):
         sql = text(f"""
                 DELETE FROM Recipe_Ingredient
@@ -98,7 +96,6 @@ class IngredientDAO:
         except Exception as e:
             return jsonify({"success": False, "error": str(e)}), 400
 
-
     def delete_all_recipe_ingredient_mappings(self, recipe_id: int):
         sql = text(f"""
                 DELETE FROM Recipe_Ingredient
@@ -110,7 +107,6 @@ class IngredientDAO:
             return jsonify({"success": True}), 204
         except Exception as e:
             return jsonify({"success": False, "error": str(e)}), 400
-
 
     def bulk_update_ingredients_on_recipe(self, recipe_id: int, ingredients: list[Ingredient]):
         self.delete_all_recipe_ingredient_mappings(recipe_id)
