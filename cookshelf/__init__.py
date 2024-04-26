@@ -23,11 +23,13 @@ def init_app(config_object='config.Config'):
         from .users.routes import users
         from cookshelf.recipes.routes import recipes
         from cookshelf.tools.routes import tools
+        from cookshelf.views.routes import views
 
         # Register Blueprints
         app.register_blueprint(ingredients, url_prefix='/ingredients')
         app.register_blueprint(users, url_prefix='/users')
         app.register_blueprint(recipes, url_prefix='/recipes')
         app.register_blueprint(tools, url_prefix='/tools')
+        app.register_blueprint(views, url_prefix='/views')
 
         return app

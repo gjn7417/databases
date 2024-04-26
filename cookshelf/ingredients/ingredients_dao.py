@@ -31,8 +31,7 @@ class IngredientDAO:
 
     def delete_ingredient(self, ingredient_id: int):
         sql = text(f"""
-                DELETE FROM Ingredients
-                WHERE id = :id
+                CALL DeleteIngredient(:id)
             """)
         try:
             self.db.session.execute(sql, {'id': ingredient_id})
