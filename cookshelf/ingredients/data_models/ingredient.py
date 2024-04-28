@@ -1,10 +1,12 @@
 import dataclasses
+from typing import Optional
+
 
 @dataclasses.dataclass
 class Ingredient:
-    id: int
     name: str
     food_category: str
+    id: Optional[int] = None
 
     @classmethod
     def from_db_row(cls, row):
