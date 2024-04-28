@@ -31,8 +31,7 @@ class ToolsDAO:
 
     def delete_tool(self, tool_id: int):
         sql = text(f"""
-                DELETE FROM Tools
-                WHERE id = :id
+                CALL DeleteTool(:id)
             """)
         try:
             self.db.session.execute(sql, {'id': tool_id})
@@ -55,3 +54,13 @@ class ToolsDAO:
             return jsonify({"success": True}), 200
         except Exception as e:
             return jsonify({"success": False, "error": str(e)}), 400
+
+    def get_tools_by_id(self, tool_ids: list[int]):
+        sql = text(f"""
+                SELECT * FROM Tools
+                WHERE id IN :tool_ids
+            """)
+        result = self.db.session.execute(sql, {'tool_ids': tool_ids}).fetchall()
+        self.db.session.commit()
+        return_dict = [Tool.from_db_row(row).__dict__ for row in result]
+        return jsonify(return_dict)

@@ -6,12 +6,14 @@ from sqlalchemy import text
 from cookshelf.ingredients.ingredients_dao import IngredientDAO
 from cookshelf.recipes.data_models.recipe import Recipe
 from cookshelf.recipes.data_models.recipe_review import RecipeReview
+from cookshelf.tools.tools_dao import ToolsDAO
 
 
 class RecipeDAO:
-    def __init__(self, db, ingredient_dao: IngredientDAO = None):
+    def __init__(self, db, ingredient_dao: IngredientDAO = None, tools_dao: ToolsDAO = None):
         self.db = db
         self.ingredient_dao = ingredient_dao or IngredientDAO(db)
+        self.tools_dao = tools_dao or ToolsDAO(db)
 
     def create_recipe(self, recipe: Recipe):
         sql = text(f"""
@@ -26,6 +28,17 @@ class RecipeDAO:
             insert_id = self.db.session.execute(text("SELECT MAX(id) from Recipes;")).scalar()
             print(f"Recipe created with id: {insert_id}")
             self.ingredient_dao.add_ingredients_to_recipe(recipe_id=insert_id, ingredients=recipe.ingredients_list)
+            return jsonify({"success": True}), 201
+        except Exception as e:
+            return jsonify({"success": False, "error": str(e)}), 400
+
+    def delete_recipe(self, recipe_id: int):
+        sql = text(f"""
+                    CALL DeleteRecipe(:id)
+                """)
+        try:
+            self.db.session.execute(sql, {'id': recipe_id})
+            self.db.session.commit()
             return jsonify({"success": True}), 201
         except Exception as e:
             return jsonify({"success": False, "error": str(e)}), 400
@@ -118,3 +131,42 @@ class RecipeDAO:
             return jsonify({"success": True}), 201
         except Exception as e:
             return jsonify({"success": False, "error": str(e)}), 400
+
+
+    def add_recipe_tool(self, recipe_id: int, tool_id: int):
+        sql = text(f"""
+                    INSERT INTO Recipe_Tools (recipe_id, tool_id)
+                    VALUES (:recipe_id, :tool_id)
+                """)
+        try:
+            self.db.session.execute(sql, {'recipe_id': recipe_id, 'tool_id': tool_id})
+            self.db.session.commit()
+            return jsonify({"success": True}), 201
+        except Exception as e:
+            return jsonify({"success": False, "error": str(e)}), 400
+
+
+    def delete_recipe_tool(self, recipe_id: int, tool_id: int):
+        sql = text(f"""
+                    DELETE FROM Recipe_Tools
+                    WHERE recipe_id = :recipe_id AND tool_id = :tool_id
+                """)
+        try:
+            self.db.session.execute(sql, {'recipe_id': recipe_id, 'tool_id': tool_id})
+            self.db.session.commit()
+            return jsonify({"success": True}), 201
+        except Exception as e:
+            return jsonify({"success": False, "error": str(e)}), 400
+
+    def get_recipe_tools(self, recipe_id: int):
+        sql = text(f"""
+                SELECT * FROM Recipe_Tools
+                WHERE recipe_id = :recipe_id
+            """)
+        result = self.db.session.execute(sql, {'recipe_id': recipe_id}).fetchall()
+        self.db.session.commit()
+
+        tools_ids = [item[1] for item in result]
+
+        return self.tools_dao.get_tools_by_id(tools_ids)
+

@@ -35,8 +35,7 @@ class UsersDAO:
 
     def delete_user(self, email: str):
         sql = text(f"""
-                DELETE FROM Users
-                WHERE email = :email
+                CALL DeleteUser(:email)
             """)
         try:
             self.db.session.execute(sql, {'email': email})
